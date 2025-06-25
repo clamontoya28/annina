@@ -10,7 +10,7 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
-CORS(app, origins=["https://jmenterprises.it","http://127.0.0.1:5500"], methods=["POST"], allow_headers=["Content-Type"]) 
+CORS(app, origins=["https://jmenterprises.it"], methods=["POST"], allow_headers=["Content-Type"]) 
 
 # --- Inizializza OpenAI ---
 try:
