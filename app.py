@@ -71,6 +71,11 @@ def chat():
         print(f"Errore generico: {e}")
         return jsonify({"error": "Errore interno"}), 500
 
+# --- Route di base per test Render ---
+@app.route('/', methods=['GET'])
+def index():
+    return "Annina AI è attiva e pronta 💖"
+
 # --- Avvio locale ---
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
