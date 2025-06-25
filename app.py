@@ -3,14 +3,14 @@ from flask_cors import CORS
 import openai
 import os
 import json
-from dotenv import load_dotenv  # <- carica variabili da .env
+from dotenv import load_dotenv  
 
 # --- Carica variabili d'ambiente ---
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
-CORS(app, origins=["*"])  # Cambia "*" con il dominio del tuo sito in produzione (es. https://annina.it)
+CORS(app, origins=["https://jmenterprises.it"], methods=["POST"], allow_headers=["Content-Type"]) 
 
 # --- Inizializza OpenAI ---
 try:
@@ -20,7 +20,7 @@ except ImportError:
     print("Errore: libreria OpenAI non installata correttamente.")
     client = None
 
-# --- Carica dataset (opzionale) ---
+
 try:
     with open('annina_dataset.json', 'r', encoding='utf-8') as f:
         annina_training_data = json.load(f)
@@ -45,7 +45,7 @@ def chat():
         return jsonify({"error": "Client OpenAI non inizializzato"}), 500
 
     try:
-        # Messaggi di sistema + utente
+
         messages = [
             {
                 "role": "system",
@@ -56,7 +56,7 @@ def chat():
 
         # Richiesta a OpenAI
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # Puoi cambiare in gpt-4, gpt-4o, ecc.
+            model="gpt-4.1-nano-2025-04-14",  
             messages=messages,
             max_tokens=250,
             temperature=0.7
@@ -76,6 +76,6 @@ def chat():
 def index():
     return "Annina AI è attiva e pronta 💖"
 
-# --- Avvio locale ---
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
