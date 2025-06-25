@@ -20,13 +20,21 @@ except ImportError:
     print("Errore: libreria OpenAI non installata correttamente.")
     client = None
 
-
+# --- Carica dataset contestuale (opzionale) ---
 try:
     with open('annina_dataset.json', 'r', encoding='utf-8') as f:
         annina_training_data = json.load(f)
 except (FileNotFoundError, json.JSONDecodeError):
     annina_training_data = []
     print("Dataset non trovato o danneggiato. L'AI lavorerà senza contesto aggiuntivo.")
+
+# --- Carica memoria emozionale ---
+try:
+    with open('mini_memoria.json', 'r', encoding='utf-8') as f:
+        annina_memory = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError):
+    annina_memory = []
+    print("Memoria emozionale non trovata o corrotta.")
 
 # --- Endpoint principale ---
 @app.route('/chat', methods=['POST'])
@@ -44,8 +52,16 @@ def chat():
     if client is None:
         return jsonify({"error": "Client OpenAI non inizializzato"}), 500
 
-    try:
+    # --- Controlla se esiste un trigger nella memoria emozionale ---
+    for item in annina_memory:
+        trigger = item.get("trigger", "").lower()
+        if trigger in user_message.lower():
+            risposta_personalizzata = item.get("response", "").strip()
+            if risposta_personalizzata:
+                return jsonify({"response": risposta_personalizzata})
 
+    # --- Se nessun trigger trovato, usa OpenAI ---
+    try:
         messages = [
             {
                 "role": "system",
@@ -54,9 +70,8 @@ def chat():
             {"role": "user", "content": user_message}
         ]
 
-        # Richiesta a OpenAI
         completion = client.chat.completions.create(
-            model="gpt-4.1-nano-2025-04-14",  
+            model="gpt-4.1-nano-2025-04-14",
             messages=messages,
             max_tokens=250,
             temperature=0.7
@@ -75,7 +90,6 @@ def chat():
 @app.route('/', methods=['GET'])
 def index():
     return "Annina AI è attiva e pronta 💖"
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
